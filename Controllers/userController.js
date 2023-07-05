@@ -4,21 +4,18 @@ const UserServise = require("./Servises/userServise");
 class UserController {
     async getOne (req, res) {
         try{
-            const {userID, taskID} = req.params;
-            console.log(req.params)
+            const {userID} = req.params;
+            const taskID = req.body.id;
             if (!userID) {
                 res.status(400).json({message: "add userID to the query params"})
             };
             const user = await User.findById(userID);
             const allTasks = [...user.currentTasks, ...user.completedTasks];
-            if (allTasks.length < 1) {
-                throw new Error("user have no one task")
-            };
             let searchedTask = UserServise.getOne(allTasks, taskID);            
             res.status(200).json(searchedTask)
         } catch (e) {
             console.log(e);
-            res.status(400).json({message: ""})
+            res.status(400).json({message: e.message})
         }
     };
     async getAll (req, res) {
@@ -35,7 +32,7 @@ class UserController {
             res.status(200).json(allTasks);
         } catch (e) {
             console.log(e);
-            res.status(400).json({message: ""})
+            res.status(400).json({message: e.message})
         }
     };
     async getCurrent (req, res) {
@@ -49,7 +46,7 @@ class UserController {
             res.status(200).json(current)
         } catch (e) {
             console.log(e);
-            res.status(400).json({message: ""})
+            res.status(400).json({message: e.message})
         }
     };
     async getComplete (req, res) {
@@ -63,7 +60,7 @@ class UserController {
             res.status(200).json(completed)
         } catch (e) {
             console.log(e);
-            res.status(400).json({message: "", e})
+            res.status(400).json({message: e.message})
         }
     };
     async create (req, res) {
@@ -74,17 +71,16 @@ class UserController {
                 res.status(400).json({message: "add user id to the query params"})
             };
             const findedUser = await User.findById(userID);
-            [...findedUser.currentTasks, ...findedUser.completedTasks ].forEach(t => {
-                if (task.id == t.id) {
+            const checker = UserServise.create([...findedUser.currentTasks, ...findedUser.completedTasks], task);
+                if (checker) {
                     res.status(400).json({message: "task with same id is already have"})
                     return
-                }
-            });
+                };
             const user = await User.findByIdAndUpdate(userID, {currentTasks: [task,  ...findedUser.currentTasks]}, {new: true});
             res.status(200).json(user.currentTasks)
         } catch (e) {
             console.log(e);
-            res.status(400).json({message: ""})
+            res.status(400).json({message: e.message})
         }
     };
     async replace (req, res) {
@@ -95,37 +91,16 @@ class UserController {
                 };
             const {id, replaceType} = req.body;
             const user = await User.findById(userID);
-            let replacedTask = null;
-                if (replaceType === "to_complete") {
-                    replacedTask = user.currentTasks.find(t => t.id == id);
-                    const cuttedTasks = user.currentTasks.filter(t => t.id !== id);
-                    const userUpdate = await User.findByIdAndUpdate(
-                        userID, 
-                        {
-                            currentTasks: cuttedTasks, 
-                            completedTasks: [replacedTask, ...user.completedTasks]
-                        },
-                        {new: true}
-                    );
-                    res.status(200).json(replacedTask)
-                };
-                if (replaceType === "to_current") {
-                    replacedTask = user.completedTasks.find(t => t.id == id);
-                    const cuttedTasks = user.completedTasks.filter(t => t.id !== id);
-                    const userUpdate = await User.findByIdAndUpdate(
-                        userID, 
-                        {
-                            currentTasks: [replacedTask, ...user.currentTasks], 
-                            completedTasks: cuttedTasks
-                        },
-                        {new: true}
-                    );
-                    res.status(200).json(replacedTask)
-                }
-            
+            const updatedData = UserServise.replace(user, replaceType, id);
+            const userUpdate = await User.findByIdAndUpdate(
+                userID, 
+                updatedData,
+                {new: true}
+            );
+            res.status(200).json(updatedData)   
         } catch (e) {
             console.log(e);
-            res.status(400).json({message: ""})
+            res.status(400).json({message: e.message})
         }
     };
     async change (req, res) {
@@ -136,19 +111,14 @@ class UserController {
             };
             const newTask = req.body;
             const user = await User.findById(userID);
-            const updatedTasks = user.currentTasks;
-            updatedTasks.forEach((t, index) => {
-                if (t.id == newTask.id) {
-                    user.currentTasks[index] = newTask;
-                }
-            });
+            const updatedTasks = UserServise.change(user.currentTasks, newTask);
             const updatedUser = await User.findByIdAndUpdate(userID, {
                 currentTasks: updatedTasks
             });
             res.status(200).json(newTask)
         } catch (e) {
             console.log(e);
-            res.status(400).json({message: ""})
+            res.status(400).json({message: e.message})
         }
     };
     async delete (req, res) {
@@ -159,25 +129,12 @@ class UserController {
             };
             const {id} = req.body;
             const user = await User.findById(userID);
-            const deleter = (cur, compl) => {
-                const element = [...cur, ...compl].find(e => e.id == id);
-                let updatedData = null;
-                if (user.currentTasks.includes(element)) {
-                    const updatedData = user.currentTasks.filter(e => e !== element);
-                    return {currentTasks: updatedData}
-                };
-                if (user.completedTasks.includes(element)) {
-                    const updatedData = user.completedTasks.filter(e => e !== element);
-                    return {completedTasks: updatedData}
-                };
-                // функція має пповертати готове поле: {"taskListName": "updatedTaskList"}
-            }
-            const update = deleter(user.currentTasks, user.completedTasks);
+            const update = UserServise.delete(user, id);
             const updatedUser = await User.findByIdAndUpdate(userID, update, {new: true});
             res.status(200).json(update)    
         } catch (e) {
             console.log(e);
-            res.status(400).json({message: ""})
+            res.status(400).json({message: e.message})
         }
     }
 };
