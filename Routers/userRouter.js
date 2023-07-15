@@ -12,17 +12,15 @@ Router.get("/all/:userID", [authMiddleware, roleMiddleware(["USER"])], userContr
 Router.get("/current/:userID", [authMiddleware, roleMiddleware(["USER"])], userController.getCurrent);
 Router.get("/complete/:userID", [authMiddleware, roleMiddleware(["USER"])], userController.getComplete);
 
-Router.put("/create/:userID", [authMiddleware, roleMiddleware(["USER"])], userController.create);
+Router.post("/create/:userID", [authMiddleware, roleMiddleware(["USER"])], userController.create);
 
 Router.put("/replace/:userID", [authMiddleware, roleMiddleware(["USER"])], userController.replace);
 Router.put("/change/:userID", [authMiddleware, roleMiddleware(["USER"])], userController.change);
 
-Router.put("/delete/:userID", [authMiddleware, roleMiddleware(["USER"])], userController.delete)
+Router.delete("/delete/:userID", [authMiddleware, roleMiddleware(["USER"])], userController.delete)
 
 
 module.exports = Router;
-
-
 
 
 

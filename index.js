@@ -10,7 +10,7 @@ const app = express();
 
 app.use(cors({
     origin: "*"
-}))
+}));
 app.use(express.json());
 app.use("/authorization", authRouter)
 app.use("/task_space", userRouter);

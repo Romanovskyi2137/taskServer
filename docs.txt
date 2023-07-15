@@ -1,8 +1,8 @@
-authorization: 
+FOR NOT AUTHORIZED USERS 
 
-"/authorization/registration" - require { username: String, password: String }, in req.body;
+POST "/authorization/registration" - require { username: String, password: String }, in req.body;
 
-"/authorization/login" - require { username: String, password: String }, in req.body, than generate and send to client jwt-token;
+POST "/authorization/login" - require { username: String, password: String }, in req.body, than generate and send to client jwt-token;
 
 
 Routes for authorizted users:
@@ -11,18 +11,18 @@ Routes for authorizted users:
 *all reqs are require header "authorization: Bearer <jwt_token>"
 
 
-"/task_space/one/:userID" - getOne task route, needs id of task in req.body;
+GET "/task_space/one/:userID" - getOne task route, needs id of task in req.body;
 
-"/task_space/all/:userID" - getall tasks route needs only userID in query params;
+GET "/task_space/all/:userID" - getall tasks route needs only userID in query params;
 
-"/task_space/current/:userID" - needs only userID in query params;
+GET "/task_space/current/:userID" - needs only userID in query params;
 
-"/task_space/complete/:userID" - same as get current route;
+GET "/task_space/complete/:userID" - same as get current route;
 
-"/task_space/create/:userID" - requires new task obj in req.body;
+POST "/task_space/create/:userID" - requires new task obj in req.body;
 
-"/task_space/replace/:userID" - requires {id, replaceType} = req.body, id - id of the task, replaceType - have a 2 variations, "to_complete"/"to_current";
+PUT "/task_space/replace/:userID" - requires {id, replaceType} = req.body, id - id of the task, replaceType - have a 2 variations, "to_complete"/"to_current";
 
-"/task_space/change/:userID" - requires new task obj in req.body;
+PUT "/task_space/change/:userID" - requires new task obj in req.body;
 
-"/task_space/delete/:userID" - requires id of the task in req.body to delete;
+DELETE "/task_space/delete/:userID" - requires id of the task in req.body to delete;
