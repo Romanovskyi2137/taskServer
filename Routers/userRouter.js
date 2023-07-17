@@ -6,24 +6,24 @@ const authMiddleware = require("../myMiddlewares/authMiddleware");
 const roleMiddleware = require("../myMiddlewares/roleMiddleware")
 
 
-Router.get("/one/:userID", [authMiddleware, roleMiddleware(["USER"])], userController.getOne);
+Router.get("/one/:taskID", [authMiddleware, roleMiddleware(["USER"])], userController.getOne);
 
-Router.get("/all/:userID", [authMiddleware, roleMiddleware(["USER"])], userController.getAll);
-Router.get("/current/:userID", [authMiddleware, roleMiddleware(["USER"])], userController.getCurrent);
-Router.get("/complete/:userID", [authMiddleware, roleMiddleware(["USER"])], userController.getComplete);
+Router.get("/all", [authMiddleware, roleMiddleware(["USER"])], userController.getAll);
+Router.get("/current", [authMiddleware, roleMiddleware(["USER"])], userController.getCurrent);
+Router.get("/complete", [authMiddleware, roleMiddleware(["USER"])], userController.getComplete);
 
-Router.post("/create/:userID", [authMiddleware, roleMiddleware(["USER"])], userController.create);
+Router.post("/create", [authMiddleware, roleMiddleware(["USER"])], userController.create);
 
-Router.put("/replace/:userID", [authMiddleware, roleMiddleware(["USER"])], userController.replace);
-Router.put("/change/:userID", [authMiddleware, roleMiddleware(["USER"])], userController.change);
+Router.put("/replace", [authMiddleware, roleMiddleware(["USER"])], userController.replace);
+Router.put("/change", [authMiddleware, roleMiddleware(["USER"])], userController.change);
 
-Router.delete("/delete/:userID", [authMiddleware, roleMiddleware(["USER"])], userController.delete)
+Router.delete("/delete/:taskID", [authMiddleware, roleMiddleware(["USER"])], userController.delete)
 
 
 module.exports = Router;
 
 
-
+// відмовитись від юзер айді, переписати з використанням гвт токена
 
 
 

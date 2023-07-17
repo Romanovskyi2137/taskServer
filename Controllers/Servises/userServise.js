@@ -7,10 +7,16 @@ class UserServise {
                 searchedTask = task
             }
         });
+        if(!searchedTask) {
+            throw new Error ("task does not exist")
+        }
         return searchedTask
     };
     create (tasks, task) {
-        tasks.forEach(t => t.id == task.id);
+        const checker = tasks.forEach(t => t.id == task.id);
+        if (checker) {
+            throw new Error ("task with same id is already have")
+        }
     };
     replace (user, replaceType, id) {
                 if (replaceType === "to_complete") {
