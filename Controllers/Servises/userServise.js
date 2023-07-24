@@ -37,13 +37,13 @@ class UserServise {
                 }
     };
     change (tasks, newTask) {
-        const updatedData = tasks;
-        updatedData.forEach((t, index) => {
+        const updateData = tasks;
+        updateData.forEach((t, index) => {
             if (t.id == newTask.id) {
-                updatedData[index] = newTask;
+                updateData[index] = newTask;
             }
         });
-        return updatedData
+        return updateData
     };
     delete (user, id) {
         const element = [...user.currentTasks, ...user.completedTasks].find(e => e.id == id);

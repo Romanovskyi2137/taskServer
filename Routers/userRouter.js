@@ -23,7 +23,7 @@ Router.delete("/delete/:taskID", [authMiddleware, roleMiddleware(["USER"])], use
 module.exports = Router;
 
 
-// відмовитись від юзер айді, переписати з використанням гвт токена
+
 
 
 
