@@ -14,13 +14,13 @@ const generateAccessToken = (id, role) => {
     return jwt.sign(payload, secret, {expiresIn: "12h"})
 }
 
-class authController {
+class AuthController {
     async registration (req, res) {
         try{
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
                 return res.status(400).json({message: "registration error", errors})
-            } 
+            }; 
             const {username, password} = req.body;
             if (password.includes(" ") || username.includes(" ")) {
                 return res.status(400).json({message: "username or password includes space symbols"})
@@ -65,13 +65,43 @@ class authController {
         }
     };
 
+    async google_login (req, res) {
+        try {
+            const {username, password} = req.body;
+            const user = await User.findOne({username});
+            if (!user) {
+                const hashPassword = bcrypt.hashSync(password, 5);
+                const userRole = await Role.findOne({value: "USER"});
+                const user = await new User({
+                    username: username,
+                    password: hashPassword,
+                    role: [userRole.value],
+                    completedTasks: [],
+                    currentTasks: [] 
+                });
+                await user.save();
+                const token = generateAccessToken(user._id, user.role);
+                return res.status(200).json({token, message: "Registration success!"})
+            };
+            const validPassword = bcrypt.compareSync(password, user.password);
+            if (!validPassword) {
+                return res.status(400).json({message: "incorrect password"})
+            };
+            const token = generateAccessToken(user._id, user.role);
+            res.status(200).json({token, message: "Login success!"})
+        } catch (error) {
+            console.log(error)
+            res.status(400).json({message: "login error", error})
+        }
+    }
+
     async test (req, res) {
         try {
-            res.status(200).json({message: "access approuve"})
+            res.status(200).json({message: "access aproove"})
         } catch (e) {
             console.log(e)
         }
     }
 };
 
-module.exports = new authController;
+module.exports = new AuthController;

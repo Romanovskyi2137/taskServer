@@ -12,6 +12,7 @@ Router.post("/registration", [
     check("password", "password will be from 6 to 12 symbs").isLength({min: 6, max: 12})
 ],authController.registration);
 Router.post("/login", authController.login);
+Router.post("/google_login", authController.google_login);
 
 
 Router.get("/test", [authMiddleware, roleMiddleware(["ADMIN"])],authController.test);
