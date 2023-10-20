@@ -100,7 +100,47 @@ class UserController {
         } catch (e) {
             res.status(400).json({message: e.message})
         }
-    }
+    };
+    async getToday (req, res) {
+        try {
+            const userID = req.user.id;
+            const user = await User.findById(userID);
+            const tasks = user.currentTasks;
+            const resData = tasks.filter(({endPoint}) => {
+                return (endPoint - Date.now()) < (1000 * 60 * 60 * 24)
+            });
+            res.status(200).json(resData)
+        } catch (error) {
+            res.status(400).json({message: error.message})
+        }
+    };
+    async getUrgently (req, res) {
+        try {
+            const urgentTime = (1000 * 60 * 60 * 24) * 3
+            const userID = req.user.id;
+            const user = await User.findById(userID);
+            const tasks = user.currentTasks;
+            const resData = tasks.filter(({endPoint}) => {
+                return (endPoint - Date.now()) < urgentTime
+            });
+            res.status(200).json(resData)
+        } catch (error) {
+            res.status(400).json({message: error.message})
+        }
+    };
+    async getMajor (req, res) {
+        try {
+            const userID = req.user.id;
+            const user = await User.findById(userID);
+            const tasks = user.currentTasks;
+            const resData = tasks.filter(({prior}) => {
+                return prior == 3
+            });
+            res.status(200).json(resData)
+        } catch (error) {
+            res.status(400).json({message: error.message})
+        }
+    };
 };
 
 

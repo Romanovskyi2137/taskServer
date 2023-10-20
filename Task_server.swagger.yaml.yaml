@@ -15,7 +15,7 @@ tags:
   - name: authorization 
     description: authorization and registration operations
   - name: task_space
-    description: Getting, adding, formating and removing data of user.
+    description: Getting, adding, updating and removing data of user.
 paths:
   /authorization/registration: 
     post: 
@@ -45,7 +45,31 @@ paths:
     post: 
       tags:
         - authorization
-      description: try to login user and send JWT authorization token in response
+      description: try to login user and send JWT authorization token as response
+      requestBody:
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/AuthForm'
+      responses:
+        "200": 
+          description: success
+          content: 
+            application/json:
+              schema:
+                  $ref: "#/components/schemas/JWTtoken"
+        "default":
+          description: something goes wrong
+          content:
+            appllication/json:
+              schema:
+                  $ref: "#/components/schemas/ErrorSchema"
+                  
+  /authorization/google_login: 
+    post: 
+      tags:
+        - authorization
+      description: try to login user and send JWT authorization token as response, by using google+firebase servises
       requestBody:
         content:
           application/json:
@@ -164,6 +188,78 @@ paths:
                   type: object
                   items:
                     $ref: "#/components/schemas/ErrorSchema"
+                    
+  /task_space/today:
+    get: 
+      tags:
+        - task_space
+      description: get all tasks of user for current day
+      security: 
+        - Authorization: 
+          - Authorization
+      responses:
+        "200": 
+          description: success
+          content: 
+            application/json:
+              schema:
+                  $ref: "#/components/schemas/TasksScheme"
+        "default":
+          description: something goes wrong
+          content:
+            appllication/json:
+              schema:
+                type: object
+                items:
+                  $ref: "#/components/schemas/ErrorSchema"
+                  
+  /task_space/urgently:
+    get: 
+      tags:
+        - task_space
+      description: get all urgently tasks of user, means the time from current time to endPoint less than 3 days
+      security: 
+        - Authorization: 
+          - Authorization
+      responses:
+        "200": 
+          description: success
+          content: 
+            application/json:
+              schema:
+                  $ref: "#/components/schemas/TasksScheme"
+        "default":
+          description: something goes wrong
+          content:
+            appllication/json:
+              schema:
+                type: object
+                items:
+                  $ref: "#/components/schemas/ErrorSchema"
+                                    
+  /task_space/major:
+    get: 
+      tags:
+        - task_space
+      description: get all major  tasks of user, means the prior of the task is 3
+      security: 
+        - Authorization: 
+          - Authorization
+      responses:
+        "200": 
+          description: success
+          content: 
+            application/json:
+              schema:
+                  $ref: "#/components/schemas/TasksScheme"
+        "default":
+          description: something goes wrong
+          content:
+            appllication/json:
+              schema:
+                type: object
+                items:
+                  $ref: "#/components/schemas/ErrorSchema"
                     
   /task_space/create:
       post: 
@@ -304,6 +400,7 @@ components:
               - title
               - body
               - prior
+              - endPoint
               - iconClassName
               - id
             properties:
@@ -316,8 +413,6 @@ components:
               iconClassName:
                 type: string
               id:
-                type: string
-              startPoint:
                 type: string
               endPoint:
                 type: string

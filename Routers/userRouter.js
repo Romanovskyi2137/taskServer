@@ -11,6 +11,11 @@ Router.get("/one/:taskID", [authMiddleware, roleMiddleware(["USER"])], userContr
 Router.get("/all", [authMiddleware, roleMiddleware(["USER"])], userController.getAll);
 Router.get("/current", [authMiddleware, roleMiddleware(["USER"])], userController.getCurrent);
 Router.get("/complete", [authMiddleware, roleMiddleware(["USER"])], userController.getComplete);
+Router.get("/today", [authMiddleware, roleMiddleware(["USER"])], userController.getToday);
+Router.get("/urgently", [authMiddleware, roleMiddleware(["USER"])], userController.getUrgently);
+Router.get("/major", [authMiddleware, roleMiddleware(["USER"])], userController.getMajor);
+
+
 
 Router.post("/create", [authMiddleware, roleMiddleware(["USER"])], userController.create);
 
