@@ -6,139 +6,104 @@ class UserController {
         try{
             const {taskID} = req.params;
             const userID = req.user.id;
-            const user = await User.findById(userID);
-            const allTasks = [...user.currentTasks, ...user.completedTasks];
-            let searchedTask = UserServise.getOne(allTasks, taskID);            
+            const searchedTask = await UserServise.getOne(userID, taskID);         
             res.status(200).json(searchedTask)
         } catch (e) {
-            console.log(e)
-            res.status(400).json({message: e.message})
+            res.status(400).json({message: e.message || e})
         }
     };
     async getAll (req, res) {
         try{
             const userID = req.user.id;
-            const user = await User.findById(userID);
-            const allTasks = [...user.currentTasks, ...user.completedTasks];
+            const allTasks = await UserServise.getAll(userID)
             res.status(200).json(allTasks);
         } catch (e) {
-            console.log(e);
-            res.status(400).json({message: e.message})
+            res.status(400).json({message: e.message || e})
         }
     };
     async getCurrent (req, res) {
         try{
             const userID = req.user.id;
-            const user = await User.findById(userID);
-            const current = user.currentTasks;
+            const current = await UserServise.getCurrent(userID);
             res.status(200).json(current)
         } catch (e) {
-            res.status(400).json({message: e.message})
+            res.status(400).json({message: e.message || e})
         }
     };
     async getComplete (req, res) {
         try{
             const userID = req.user.id;
-            const user = await User.findById(userID);
-            const completed = user.completedTasks;
+            const completed = await UserServise.getComplete(userID);
             res.status(200).json(completed)
         } catch (e) {
-            res.status(400).json({message: e.message})
+            res.status(400).json({message: e.message || e})
         }
     };
     async create (req, res) {
         try{
             const userID = req.user.id;
-            const findedUser = await User.findById(userID);
             const task = req.body;
-            UserServise.create([...findedUser.currentTasks, ...findedUser.completedTasks], task);
-            const user = await User.findByIdAndUpdate(userID, {currentTasks: [task,  ...findedUser.currentTasks]}, {new: true});
-            res.status(200).json(user.currentTasks)
+            const response = await UserServise.create(userID, task)
+            res.status(200).json(task)
         } catch (e) {
-            res.status(400).json({message: e.message})
+            res.status(400).json({message: e.message || e})
         }
     };
     async replace (req, res) {
         try{
             const userID = req.user.id;
-            const {id, replaceType} = req.body;
-            const user = await User.findById(userID);
-            const updatedData = UserServise.replace(user, replaceType, id);
-            const userUpdate = await User.findByIdAndUpdate(
-                userID, 
-                updatedData,
-                {new: true}
-            );
-            res.status(200).json(updatedData)   
+            const {id: taskID, replaceType} = req.body;
+            const update = await UserServise.replace(userID, replaceType, taskID)
+            res.status(200).json({message: "succsess!", update})   
         } catch (e) {
-            res.status(400).json({message: e.message})
+            res.status(400).json({message: e.message || e})
         }
     };
     async change (req, res) {
         try{
             const userID = req.user.id;
             const newTask = req.body;
-            const user = await User.findById(userID);
-            const updatedTasks = UserServise.change(user.currentTasks, newTask);
-            const updatedUser = await User.findByIdAndUpdate(
-                userID, 
-                {currentTasks: updatedTasks}
-                );
-            res.status(200).json(newTask)
+            const updatedTask = await UserServise.change(userID, newTask);
+            res.status(200).json(updatedTask)
         } catch (e) {
-            res.status(400).json({message: e.message})
+            res.status(400).json({message: e.message || e})
         }
     };
     async delete (req, res) {
         try{
             const {taskID} = req.params;
             const userID = req.user.id;
-            const user = await User.findById(userID);
-            const update = UserServise.delete(user, taskID);
-            const updatedUser = await User.findByIdAndUpdate(userID, update, {new: true});
+            const update = await UserServise.delete(userID, taskID);
             res.status(200).json(update)    
         } catch (e) {
-            res.status(400).json({message: e.message})
+            res.status(400).json({message: e.message || e})
         }
     };
     async getToday (req, res) {
         try {
             const userID = req.user.id;
-            const user = await User.findById(userID);
-            const tasks = user.currentTasks;
-            const resData = tasks.filter(({endPoint}) => {
-                return (endPoint - Date.now()) < (1000 * 60 * 60 * 24)
-            });
+            const resData = await UserServise.getToday(userID)
             res.status(200).json(resData)
-        } catch (error) {
-            res.status(400).json({message: error.message})
+        } catch (e) {
+            res.status(400).json({message: e.message || e})
         }
     };
     async getUrgently (req, res) {
         try {
-            const urgentTime = (1000 * 60 * 60 * 24) * 3
             const userID = req.user.id;
-            const user = await User.findById(userID);
-            const tasks = user.currentTasks;
-            const resData = tasks.filter(({endPoint}) => {
-                return (endPoint - Date.now()) < urgentTime
-            });
+            const resData = await UserServise.getUrgently(userID)
             res.status(200).json(resData)
-        } catch (error) {
-            res.status(400).json({message: error.message})
+        } catch (e) {
+            res.status(400).json({message: e.message || e})
         }
     };
     async getMajor (req, res) {
         try {
             const userID = req.user.id;
-            const user = await User.findById(userID);
-            const tasks = user.currentTasks;
-            const resData = tasks.filter(({prior}) => {
-                return prior == 3
-            });
+            const resData = await UserServise.getMajor(userID);
             res.status(200).json(resData)
-        } catch (error) {
-            res.status(400).json({message: error.message})
+        } catch (e) {
+            res.status(400).json({message: e.message || e})
         }
     };
 };
