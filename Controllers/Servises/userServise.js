@@ -178,7 +178,7 @@ class UserServise {
             const user = await User.findById(userID);
             const tasks = user.currentTasks;
             const resData = tasks.filter(({prior}) => {
-                return prior == 3
+                return prior == 1
             });
             return resData
         } catch (e) {
