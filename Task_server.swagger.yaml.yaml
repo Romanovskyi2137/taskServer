@@ -345,7 +345,7 @@ paths:
                 schema:
                     $ref: "#/components/schemas/ErrorSchema"
   
-  /task_space//delete/{:taskID}:
+  /task_space/delete/{:taskID}:
     delete: 
         tags:
           - task_space
