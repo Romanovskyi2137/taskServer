@@ -1,6 +1,6 @@
 {
   "engines": {
-    "node": ">=14.20.1"
+    "node": ">=22.16.0"
   },
   "name": "taskserver",
   "version": "1.0.0",
